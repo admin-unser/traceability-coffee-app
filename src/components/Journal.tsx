@@ -7,7 +7,6 @@ import {
   Filter, 
   Download, 
   ChevronDown, 
-  ChevronUp,
   Calendar,
   TrendingUp,
   Clock
