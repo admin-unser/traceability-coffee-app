@@ -1,0 +1,230 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Base colors */
+  --color-base-warm: #FFFBF5;
+  --color-base-cream: #FFF8F0;
+  --color-base-white: #FFFFFF;
+  
+  /* Text colors */
+  --color-text-primary: #3D3D3D;
+  --color-text-secondary: #7A7A7A;
+  --color-text-muted: #A0A0A0;
+  
+  /* Accent colors */
+  --color-terracotta: #C2703E;
+  --color-terracotta-dark: #8B5A3C;
+  --color-forest: #4A7C59;
+  --color-sand: #D4A574;
+  --color-coffee-red: #C41E3A;
+  
+  /* Shadow values */
+  --shadow-soft: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
+  --shadow-soft-lg: 0 4px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', 'Zen Kaku Gothic New', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-base-warm);
+  color: var(--color-text-primary);
+}
+
+/* Natural card styles - using CSS directly instead of @apply */
+.card-natural {
+  background-color: white;
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.card-natural-hover {
+  background-color: white;
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-soft);
+  transition: all 0.3s ease;
+}
+
+.card-natural-hover:hover {
+  box-shadow: var(--shadow-soft-lg);
+  transform: translateY(-4px);
+}
+
+/* Header style */
+.header-terracotta {
+  background-color: var(--color-terracotta);
+  color: white;
+}
+
+/* Shadow utility classes */
+.shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+
+.shadow-soft-lg {
+  box-shadow: var(--shadow-soft-lg);
+}
+
+.shadow-terracotta {
+  box-shadow: 0 4px 20px rgba(194, 112, 62, 0.25);
+}
+
+/* Button styles */
+.btn-primary {
+  padding: 0.625rem 1.25rem;
+  font-weight: 600;
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+  background-color: var(--color-terracotta);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-terracotta-dark);
+  box-shadow: 0 4px 20px rgba(194, 112, 62, 0.3);
+}
+
+.btn-primary:active {
+  transform: scale(0.95);
+}
+
+.btn-secondary {
+  padding: 0.625rem 1.25rem;
+  font-weight: 500;
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+  background-color: var(--color-base-cream);
+  color: var(--color-text-primary);
+}
+
+.btn-secondary:hover {
+  background-color: #F5EDE5;
+}
+
+.btn-ghost {
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  color: var(--color-text-secondary);
+}
+
+.btn-ghost:hover {
+  background-color: rgba(194, 112, 62, 0.1);
+  color: var(--color-terracotta);
+}
+
+/* Input styles */
+.input-natural {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+  background-color: var(--color-base-cream);
+  border: 2px solid transparent;
+  color: var(--color-text-primary);
+}
+
+.input-natural::placeholder {
+  color: var(--color-text-muted);
+}
+
+.input-natural:focus {
+  outline: none;
+  border-color: var(--color-terracotta);
+  background-color: white;
+}
+
+/* Badge styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge-terracotta {
+  background-color: rgba(194, 112, 62, 0.15);
+  color: var(--color-terracotta);
+}
+
+.badge-forest {
+  background-color: rgba(74, 124, 89, 0.15);
+  color: var(--color-forest);
+}
+
+.badge-sand {
+  background-color: rgba(212, 165, 116, 0.2);
+  color: #8B6914;
+}
+
+.badge-red {
+  background-color: rgba(196, 30, 58, 0.15);
+  color: var(--color-coffee-red);
+}
+
+/* Number display (monospace) */
+.font-data {
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Soft divider */
+.divider-soft {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+/* Selection styling */
+::selection {
+  background: rgba(194, 112, 62, 0.2);
+  color: inherit;
+}
+
+/* Focus visible for accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-terracotta);
+  outline-offset: 2px;
+}
+
+/* Dark mode overrides (optional - maintaining compatibility) */
+.dark body {
+  background-color: #1a1a1a;
+  color: #f0f0f0;
+}
+
+.dark .card-natural {
+  background-color: #2a2a2a;
+}
+
+.dark .input-natural {
+  background-color: #2a2a2a;
+  color: #f0f0f0;
+}
