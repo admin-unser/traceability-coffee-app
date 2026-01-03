@@ -7,6 +7,7 @@ import { Dashboard } from './components/Dashboard';
 import { TreeMaster } from './components/TreeMaster';
 import { Journal } from './components/Journal';
 import { BackOffice } from './components/BackOffice';
+import { AIInsights } from './components/AIInsights';
 import { MobileMenu, type MenuItem } from './components/MobileMenu';
 import { ActivityForm } from './components/ActivityForm';
 import { PageTransition, AnimatedModal } from './components/AnimatedComponents';
@@ -106,6 +107,12 @@ function App() {
                 onActivityEdit={handleEditActivity}
                 onActivityDelete={handleDeleteActivity}
               />
+            </PageTransition>
+          )}
+
+          {currentView === 'insights' && (
+            <PageTransition key="insights">
+              <AIInsights activities={activities} />
             </PageTransition>
           )}
 

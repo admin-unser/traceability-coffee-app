@@ -227,5 +227,198 @@ ${JSON.stringify(recentActivities, null, 2)}
       return '週次サマリーの生成に失敗しました。';
     }
   },
+
+  async generateCultivationInsights(activities: any[]): Promise<{
+    summary: string;
+    trends: string[];
+    warnings: string[];
+    recommendations: string[];
+  }> {
+    const apiKey = getGeminiApiKey();
+    if (!apiKey) {
+      throw new Error('GEMINI_API_KEYが設定されていません。.envファイルに設定してください。');
+    }
+
+    const activityTypeLabels: Record<string, string> = {
+      harvest: '収穫',
+      fertilize: '施肥',
+      prune: '剪定',
+      process: '加工',
+      observe: '観察',
+      pestControl: '防除',
+      mowing: '草刈り',
+      planting: '植栽',
+    };
+
+    const formattedActivities = activities.slice(0, 30).map(a => ({
+      日付: a.date,
+      活動タイプ: activityTypeLabels[a.type] || a.type,
+      説明: a.description,
+      数値: a.numericValue ? `${a.numericValue}${a.numericUnit || ''}` : undefined,
+      AI診断: a.aiDiagnosis?.advice,
+    }));
+
+    const prompt = `あなたは沖縄県のコーヒー栽培の専門家（アグロノミスト）です。以下の活動記録を分析し、栽培プロセス全体に関するインサイトを提供してください。
+
+活動記録:
+${JSON.stringify(formattedActivities, null, 2)}
+
+以下の形式でJSON形式で回答してください（必ず有効なJSONで回答）:
+{
+  "summary": "全体的なサマリー（2-3文）",
+  "trends": ["傾向1", "傾向2", "傾向3"],
+  "warnings": ["注意点1", "注意点2"],
+  "recommendations": ["推奨事項1", "推奨事項2", "推奨事項3"]
+}
+
+沖縄の気候（高温多湿、台風の影響など）を考慮し、具体的で実用的なインサイトを提供してください。`;
+
+    const apiUrl = getGeminiApiUrl();
+    const response = await fetch(
+      `${apiUrl}?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: prompt }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2048,
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Gemini API error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    try {
+      // JSONをパース（コードブロックがある場合は除去）
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
+      throw new Error('JSONの解析に失敗しました');
+    } catch (e) {
+      // パースに失敗した場合はデフォルト形式で返す
+      return {
+        summary: text,
+        trends: [],
+        warnings: [],
+        recommendations: [],
+      };
+    }
+  },
+
+  async generateBestPractices(activities: any[]): Promise<{
+    fertilization: string;
+    pruning: string;
+    pestControl: string;
+    general: string;
+  }> {
+    const apiKey = getGeminiApiKey();
+    if (!apiKey) {
+      throw new Error('GEMINI_API_KEYが設定されていません。.envファイルに設定してください。');
+    }
+
+    const activityTypeLabels: Record<string, string> = {
+      harvest: '収穫',
+      fertilize: '施肥',
+      prune: '剪定',
+      process: '加工',
+      observe: '観察',
+      pestControl: '防除',
+      mowing: '草刈り',
+      planting: '植栽',
+    };
+
+    // 活動の統計を計算
+    const stats = activities.reduce((acc, a) => {
+      acc[a.type] = (acc[a.type] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const formattedActivities = activities.slice(0, 20).map(a => ({
+      日付: a.date,
+      活動タイプ: activityTypeLabels[a.type] || a.type,
+      説明: a.description,
+    }));
+
+    const prompt = `あなたは沖縄県のコーヒー栽培の専門家（アグロノミスト）です。以下の活動記録と統計を分析し、最適な栽培実践方法を提案してください。
+
+活動統計:
+${Object.entries(stats).map(([type, count]) => `- ${activityTypeLabels[type] || type}: ${count}回`).join('\n')}
+
+最近の活動記録:
+${JSON.stringify(formattedActivities, null, 2)}
+
+以下の形式でJSON形式で回答してください（必ず有効なJSONで回答）:
+{
+  "fertilization": "施肥に関する具体的なアドバイス（時期、量、種類など）",
+  "pruning": "剪定に関する具体的なアドバイス（時期、方法など）",
+  "pestControl": "病害虫対策に関する具体的なアドバイス",
+  "general": "その他の一般的な栽培のヒントや推奨事項"
+}
+
+沖縄の気候（高温多湿、台風の影響など）を考慮し、具体的で実用的なアドバイスを提供してください。各項目は2-4文程度で簡潔に。`;
+
+    const apiUrl = getGeminiApiUrl();
+    const response = await fetch(
+      `${apiUrl}?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: prompt }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.7,
+            maxOutputTokens: 2048,
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Gemini API error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`);
+    }
+
+    const data = await response.json();
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    try {
+      // JSONをパース（コードブロックがある場合は除去）
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        return JSON.parse(jsonMatch[0]);
+      }
+      throw new Error('JSONの解析に失敗しました');
+    } catch (e) {
+      // パースに失敗した場合はデフォルト形式で返す
+      return {
+        fertilization: text,
+        pruning: '剪定のアドバイスを取得できませんでした。',
+        pestControl: '病害虫対策のアドバイスを取得できませんでした。',
+        general: '',
+      };
+    }
+  },
 };
 
