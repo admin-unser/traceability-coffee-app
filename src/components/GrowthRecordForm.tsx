@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Save, Ruler, Circle, Leaf, Heart, Droplets, Camera, X, Image } from 'lucide-react';
+import { Save, Ruler, Heart, Droplets, Camera, X, Image } from 'lucide-react';
 import type { GrowthRecord, HealthStatus, Tree } from '../types/tree';
 import { imageUtils } from '../utils/image';
 import { LoadingSpinner } from './AnimatedComponents';

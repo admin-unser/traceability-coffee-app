@@ -36,5 +36,31 @@ export const imageUtils = {
       input.click();
     });
   },
+
+  async selectFromGallery(): Promise<string | null> {
+    return new Promise((resolve) => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      // capture属性なしで、ギャラリーから選択
+      
+      input.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (file) {
+          try {
+            const base64 = await this.fileToBase64(file);
+            resolve(base64);
+          } catch (error) {
+            console.error('Failed to convert image:', error);
+            resolve(null);
+          }
+        } else {
+          resolve(null);
+        }
+      };
+      
+      input.click();
+    });
+  },
 };
 
