@@ -1,0 +1,35 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="40" cy="40" r="38" fill="#FFF8F0" stroke="#C2703E" stroke-width="2.5"/>
+  
+  <!-- Coffee leaf (left) -->
+  <path d="M 20 45 Q 25 30, 35 28 Q 30 40, 25 50 Q 22 48, 20 45" 
+        fill="#4A7C59" opacity="0.9"/>
+  <path d="M 22 44 Q 26 35, 33 32" 
+        stroke="#3B6347" stroke-width="1" fill="none" stroke-linecap="round"/>
+  
+  <!-- Coffee leaf (right) -->
+  <path d="M 60 45 Q 55 30, 45 28 Q 50 40, 55 50 Q 58 48, 60 45" 
+        fill="#4A7C59" opacity="0.9"/>
+  <path d="M 58 44 Q 54 35, 47 32" 
+        stroke="#3B6347" stroke-width="1" fill="none" stroke-linecap="round"/>
+  
+  <!-- Coffee bean (center) -->
+  <ellipse cx="40" cy="48" rx="12" ry="16" fill="#C2703E"/>
+  
+  <!-- Bean center line -->
+  <path d="M 40 34 Q 36 42, 40 50 Q 44 58, 40 62" 
+        stroke="#8B5A3C" stroke-width="2" fill="none" stroke-linecap="round"/>
+  
+  <!-- Bean highlight -->
+  <ellipse cx="36" cy="44" rx="3" ry="4" fill="#D4A574" opacity="0.5"/>
+  
+  <!-- Small coffee cherries -->
+  <circle cx="28" cy="22" r="4" fill="#C41E3A"/>
+  <circle cx="52" cy="22" r="4" fill="#C41E3A"/>
+  <circle cx="40" cy="18" r="3" fill="#C41E3A" opacity="0.7"/>
+  
+  <!-- Cherry stems -->
+  <path d="M 28 22 Q 32 18, 40 18 Q 48 18, 52 22" 
+        stroke="#4A7C59" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+</svg>
