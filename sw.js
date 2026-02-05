@@ -1,12 +1,10 @@
-const CACHE_NAME = 'coffee-traceability-v1';
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json'
-];
+const CACHE_NAME = 'coffee-traceability-v2';
+const urlsToCache = ['/', '/index.html', '/manifest.json'];
 
 // インストール時にキャッシュを作成
 self.addEventListener('install', (event) => {
+  // 新しいSWを即時有効化
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -18,6 +16,20 @@ self.addEventListener('install', (event) => {
 
 // フェッチ時にキャッシュを使用
 self.addEventListener('fetch', (event) => {
+  // SPAのナビゲーションはネットワーク優先（更新反映のため）
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const responseToCache = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put('/index.html', responseToCache));
+          return response;
+        })
+        .catch(() => caches.match('/index.html'))
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
@@ -52,6 +64,7 @@ self.addEventListener('fetch', (event) => {
 self.addEventListener('activate', (event) => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
+    self.clients.claim().then(() =>
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
@@ -60,7 +73,7 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    })
+    }))
   );
 });
 

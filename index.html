@@ -14,8 +14,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <title>Coffee traceability - コーヒー栽培管理アプリ</title>
-    <script type="module" crossorigin src="/assets/index-dLTII4M2.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-4wsfNI1D.css">
+    <script type="module" crossorigin src="/assets/index-pWveJqUm.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-CaCzAFxM.css">
   </head>
   <body>
     <div id="root"></div>
@@ -23,6 +23,14 @@
       // Service Workerの登録
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
+          // 開発中(localhost)はキャッシュが邪魔になるため登録しない
+          const isLocalhost =
+            location.hostname === 'localhost' ||
+            location.hostname === '127.0.0.1' ||
+            location.hostname === '0.0.0.0';
+
+          if (isLocalhost) return;
+
           navigator.serviceWorker.register('/sw.js')
             .then((registration) => {
               console.log('ServiceWorker registered:', registration.scope);
