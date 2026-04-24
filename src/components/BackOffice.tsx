@@ -1,24 +1,50 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Download, Upload, Trash2, Moon, Sun, Settings, BarChart3, HardDrive } from 'lucide-react';
+import { Download, Upload, Trash2, Moon, Sun, Settings, BarChart3, HardDrive, MapPin, FileSpreadsheet } from 'lucide-react';
 import { storageService } from '../services/storage';
 import { treeService } from '../services/tree';
 import { themeService, type Theme } from '../services/theme';
+import { locationService, type LocationConfig } from '../services/location';
 import { ReminderSettings } from './ReminderSettings';
 import { TreeActivityHistory } from './TreeActivityHistory';
+import { SheetsConfig } from './SheetsConfig';
 import { StaggerContainer, StaggerItem, AnimatedCounter, FadeIn } from './AnimatedComponents';
 
 export function BackOffice() {
   const [exportFormat, setExportFormat] = useState<'csv' | 'json'>('csv');
   const [theme, setTheme] = useState<Theme>(themeService.getTheme());
+  const [location, setLocation] = useState<LocationConfig>(locationService.getConfig());
+  const [showLocationForm, setShowLocationForm] = useState(false);
+  const [showSheetsConfig, setShowSheetsConfig] = useState(false);
+  const [locationFormData, setLocationFormData] = useState<LocationConfig>(location);
 
   useEffect(() => {
     themeService.applyTheme(theme);
   }, [theme]);
 
+  useEffect(() => {
+    setLocation(locationService.getConfig());
+    setLocationFormData(locationService.getConfig());
+  }, []);
+
   const handleThemeChange = (newTheme: Theme) => {
     setTheme(newTheme);
     themeService.setTheme(newTheme);
+  };
+
+  const handleLocationSave = () => {
+    locationService.saveConfig(locationFormData);
+    setLocation(locationFormData);
+    setShowLocationForm(false);
+    // ページをリロードして天気情報を更新
+    window.location.reload();
+  };
+
+  const handleLocationReset = () => {
+    locationService.resetToDefault();
+    const defaultLocation = locationService.getConfig();
+    setLocation(defaultLocation);
+    setLocationFormData(defaultLocation);
   };
 
   const handleExport = () => {
@@ -129,6 +155,135 @@ export function BackOffice() {
       </FadeIn>
 
       <StaggerContainer className="space-y-4">
+        {/* Location Settings */}
+        <StaggerItem>
+          <div className="card-natural p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-forest-100 flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-forest-500" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-text-primary">現在地設定</h3>
+                <p className="text-sm text-text-secondary">天気情報の取得位置を設定</p>
+              </div>
+            </div>
+            {!showLocationForm ? (
+              <div className="space-y-3">
+                <div className="p-4 rounded-2xl bg-base-cream">
+                  <p className="text-sm text-text-secondary mb-1">現在の設定</p>
+                  <p className="text-base font-semibold text-text-primary">{location.name}</p>
+                  <p className="text-xs text-text-muted mt-1">
+                    緯度: {location.latitude}, 経度: {location.longitude}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => setShowLocationForm(true)}
+                    className="flex-1 px-4 py-3 bg-terracotta-500 text-white rounded-xl font-medium hover:bg-terracotta-600 transition-colors"
+                  >
+                    変更
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleLocationReset}
+                    className="px-4 py-3 bg-base-cream text-text-secondary rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                  >
+                    リセット
+                  </motion.button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-text-primary mb-2">
+                    場所名
+                  </label>
+                  <input
+                    type="text"
+                    value={locationFormData.name}
+                    onChange={(e) => setLocationFormData({ ...locationFormData, name: e.target.value })}
+                    placeholder="例: 沖縄県大宜味村"
+                    className="input-natural w-full"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-text-primary mb-2">
+                      緯度
+                    </label>
+                    <input
+                      type="number"
+                      step="0.0001"
+                      value={locationFormData.latitude}
+                      onChange={(e) => setLocationFormData({ ...locationFormData, latitude: parseFloat(e.target.value) || 0 })}
+                      className="input-natural w-full"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-text-primary mb-2">
+                      経度
+                    </label>
+                    <input
+                      type="number"
+                      step="0.0001"
+                      value={locationFormData.longitude}
+                      onChange={(e) => setLocationFormData({ ...locationFormData, longitude: parseFloat(e.target.value) || 0 })}
+                      className="input-natural w-full"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleLocationSave}
+                    className="flex-1 px-4 py-3 bg-terracotta-500 text-white rounded-xl font-medium hover:bg-terracotta-600 transition-colors"
+                  >
+                    保存
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => {
+                      setShowLocationForm(false);
+                      setLocationFormData(location);
+                    }}
+                    className="px-4 py-3 bg-base-cream text-text-secondary rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                  >
+                    キャンセル
+                  </motion.button>
+                </div>
+              </div>
+            )}
+          </div>
+        </StaggerItem>
+
+        {/* Spreadsheet Sync Settings */}
+        <StaggerItem>
+          <div className="card-natural p-5">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-2xl bg-sand-400/20 flex items-center justify-center">
+                <FileSpreadsheet className="w-5 h-5 text-sand-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-text-primary">スプレッドシート同期</h3>
+                <p className="text-sm text-text-secondary">Google Sheetsとデータを同期</p>
+              </div>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setShowSheetsConfig(true)}
+              className="w-full px-4 py-3 bg-terracotta-500 text-white rounded-xl font-medium hover:bg-terracotta-600 transition-colors"
+            >
+              設定を開く
+            </motion.button>
+          </div>
+        </StaggerItem>
+
         {/* Reminder Settings */}
         <StaggerItem>
           <ReminderSettings />
@@ -331,6 +486,16 @@ export function BackOffice() {
           </div>
         </StaggerItem>
       </StaggerContainer>
+
+      {/* Sheets Config Modal */}
+      {showSheetsConfig && (
+        <SheetsConfig
+          onClose={() => setShowSheetsConfig(false)}
+          onConfigSaved={() => {
+            setShowSheetsConfig(false);
+          }}
+        />
+      )}
     </div>
   );
 }

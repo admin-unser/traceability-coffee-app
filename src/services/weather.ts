@@ -1,8 +1,5 @@
 import type { WeatherData, WeatherCondition } from '../types';
-
-// 沖縄県大宜味村の座標（概算）
-const OGIMI_LAT = 26.7;
-const OGIMI_LON = 128.1;
+import { locationService } from './location';
 
 const conditionMap: Record<number, WeatherCondition> = {
   0: 'sunny',    // Clear sky
@@ -34,7 +31,8 @@ const conditionMap: Record<number, WeatherCondition> = {
 export const weatherService = {
   async getCurrentWeather(): Promise<WeatherData> {
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${OGIMI_LAT}&longitude=${OGIMI_LON}&current=temperature_2m,relative_humidity_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo&forecast_days=1`;
+      const location = locationService.getConfig();
+      const url = `https://api.open-meteo.com/v1/forecast?latitude=${location.latitude}&longitude=${location.longitude}&current=temperature_2m,relative_humidity_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FTokyo&forecast_days=1`;
       
       const response = await fetch(url);
       if (!response.ok) {

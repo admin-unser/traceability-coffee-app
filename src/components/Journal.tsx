@@ -163,10 +163,11 @@ export function Journal({ activities, onNewActivity, onActivityEdit, onActivityD
 
   // Export to CSV
   const handleExport = () => {
-    const headers = ['日付', '種類', '樹木ID', '説明', '数量', '単位'];
+    const headers = ['日付', '種類', '区画ID', '樹木ID', '説明', '数量', '単位'];
     const rows = filteredActivities.map(a => [
       new Date(a.date).toLocaleDateString('ja-JP'),
       activityTypeLabels[a.type],
+      a.plotId || '',
       a.treeId || '',
       a.description,
       a.numericValue?.toString() || '',

@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion';
-import { Home, TreePine, BookOpen, Settings, Camera, Sparkles } from 'lucide-react';
+import { Home, TreePine, Settings, Camera, Coffee } from 'lucide-react';
 import { PulseButton } from './AnimatedComponents';
 
-export type MenuItem = 'home' | 'trees' | 'camera' | 'journal' | 'insights' | 'settings';
+export type MenuItem = 'home' | 'trees' | 'camera' | 'coffee-diary' | 'settings';
 
 interface MobileMenuProps {
   currentView: MenuItem;
@@ -13,8 +13,7 @@ interface MobileMenuProps {
 const menuItems: { id: MenuItem; label: string; icon: typeof Home }[] = [
   { id: 'home', label: 'ホーム', icon: Home },
   { id: 'trees', label: '樹木', icon: TreePine },
-  { id: 'journal', label: '日誌', icon: BookOpen },
-  { id: 'insights', label: 'AI', icon: Sparkles },
+  { id: 'coffee-diary', label: '飲用日誌', icon: Coffee },
   { id: 'settings', label: '設定', icon: Settings },
 ];
 

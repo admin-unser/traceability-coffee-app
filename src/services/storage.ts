@@ -63,6 +63,7 @@ export const storageService = {
       'ID',
       'タイプ',
       '日付',
+      '区画ID',
       '木番号',
       '説明',
       '数値',
@@ -78,6 +79,7 @@ export const storageService = {
       activity.id,
       activity.type,
       activity.date,
+      activity.plotId || '',
       activity.treeId || '',
       activity.description.replace(/,/g, '，'), // CSV用にカンマを全角に
       activity.numericValue?.toString() || '',

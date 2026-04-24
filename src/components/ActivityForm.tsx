@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Save, X, TreePine, Sparkles, Clock, Image } from 'lucide-react';
+import { Camera, Save, X, TreePine, Sparkles, Clock, Image, Grid3x3 } from 'lucide-react';
 import type { ActivityType, Activity, WeatherData } from '../types';
-import type { Tree } from '../types/tree';
 import { weatherService } from '../services/weather';
 import { imageUtils } from '../utils/image';
 import { geminiService } from '../services/gemini';
-import { treeService } from '../services/tree';
+import { treeService, plotService } from '../services/tree';
+import type { Plot } from '../types/tree';
 import { LoadingSpinner } from './AnimatedComponents';
 
 interface ActivityFormProps {
@@ -45,6 +45,7 @@ export function ActivityForm({ onSave, onCancel, initialActivity }: ActivityForm
       ? new Date(initialActivity.date).toTimeString().slice(0, 5)
       : new Date().toTimeString().slice(0, 5)
   );
+  const [plotId, setPlotId] = useState(initialActivity?.plotId || '');
   const [treeId, setTreeId] = useState(initialActivity?.treeId || '');
   const [description, setDescription] = useState(initialActivity?.description || '');
   const [numericValue, setNumericValue] = useState(initialActivity?.numericValue?.toString() || '');
@@ -54,11 +55,20 @@ export function ActivityForm({ onSave, onCancel, initialActivity }: ActivityForm
   const [loading, setLoading] = useState(false);
   const [diagnosing, setDiagnosing] = useState(false);
   const [aiDiagnosis, setAiDiagnosis] = useState(initialActivity?.aiDiagnosis);
-  const [trees, setTrees] = useState<Tree[]>([]);
+  const [plots, setPlots] = useState<Plot[]>([]);
+
+  const treesInPlot = useMemo(() => {
+    if (!plotId) return treeService.getAll();
+    return treeService.getByPlotId(plotId);
+  }, [plotId]);
 
   useEffect(() => {
-    setTrees(treeService.getAll());
-    
+    setPlots(plotService.getAll());
+    if (initialActivity?.plotId) setPlotId(initialActivity.plotId);
+    if (initialActivity?.treeId && !initialActivity?.plotId) {
+      const t = treeService.getByTreeId(initialActivity.treeId);
+      if (t?.plotId) setPlotId(t.plotId);
+    }
     if (!initialActivity?.weather) {
       weatherService.getCurrentWeather()
         .then((weatherData) => {
@@ -129,6 +139,7 @@ export function ActivityForm({ onSave, onCancel, initialActivity }: ActivityForm
       id: initialActivity?.id || `activity_${Date.now()}`,
       type,
       date: dateTime.toISOString(),
+      plotId: plotId || undefined,
       treeId: treeId || undefined,
       description,
       numericValue: numericValue ? parseFloat(numericValue) : undefined,
@@ -203,7 +214,33 @@ export function ActivityForm({ onSave, onCancel, initialActivity }: ActivityForm
         </div>
       </div>
 
-      {/* Tree Selection */}
+      {/* 区画・樹木選択（区画ごとに管理） */}
+      {plots.length > 0 && (
+        <div>
+          <label className="block text-sm font-medium text-text-primary mb-2">
+            <span className="flex items-center gap-1.5">
+              <Grid3x3 className="w-4 h-4" />
+              区画（任意）
+            </span>
+          </label>
+          <select
+            value={plotId}
+            onChange={(e) => {
+              setPlotId(e.target.value);
+              setTreeId(''); // 区画変更時は樹木をリセット
+            }}
+            className="input-natural"
+          >
+            <option value="">選択しない</option>
+            {plots.map((plot) => (
+              <option key={plot.id} value={plot.id}>
+                {plot.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <div>
         <label className="block text-sm font-medium text-text-primary mb-2">
           <span className="flex items-center gap-1.5">
@@ -211,14 +248,14 @@ export function ActivityForm({ onSave, onCancel, initialActivity }: ActivityForm
             樹木（任意）
           </span>
         </label>
-        {trees.length > 0 ? (
+        {treesInPlot.length > 0 ? (
           <select
             value={treeId}
             onChange={(e) => setTreeId(e.target.value)}
             className="input-natural"
           >
-            <option value="">選択しない</option>
-            {trees.map((tree) => (
+            <option value="">{plotId ? '区画全体' : '選択しない'}</option>
+            {treesInPlot.map((tree) => (
               <option key={tree.id} value={tree.treeId}>
                 {tree.treeId} {tree.name ? `(${tree.name})` : ''} {tree.variety ? `- ${tree.variety}` : ''}
               </option>

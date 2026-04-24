@@ -1,30 +1,27 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Thermometer, Droplets, Calendar, ArrowUp, ArrowDown } from 'lucide-react';
+import { MapPin, Thermometer, Droplets, ArrowUp, ArrowDown } from 'lucide-react';
 import type { Activity, WeatherData } from '../types';
 import { weatherService } from '../services/weather';
-import { ActivityCalendar } from './ActivityCalendar';
-import { ActivityList } from './ActivityList';
-import { CoffeeNews } from './CoffeeNews';
+import { locationService } from '../services/location';
+import { Journal } from './Journal';
 import { StaggerContainer, StaggerItem, AnimatedCounter } from './AnimatedComponents';
 
 interface DashboardProps {
   activities: Activity[];
+  onNewActivity?: () => void;
   onActivityEdit?: (activity: Activity) => void;
   onActivityDelete?: (id: string) => void;
 }
 
-export function Dashboard({ activities, onActivityEdit, onActivityDelete }: DashboardProps) {
+export function Dashboard({ activities, onNewActivity, onActivityEdit, onActivityDelete }: DashboardProps) {
   const [weather, setWeather] = useState<WeatherData | null>(null);
-  const [recentActivities, setRecentActivities] = useState<Activity[]>([]);
+  const [location, setLocation] = useState(locationService.getConfig());
 
   useEffect(() => {
     weatherService.getCurrentWeather().then(setWeather).catch(console.error);
+    setLocation(locationService.getConfig());
   }, []);
-
-  useEffect(() => {
-    setRecentActivities(activities.slice(0, 5));
-  }, [activities]);
 
   return (
     <StaggerContainer className="space-y-4 p-4">
@@ -42,7 +39,7 @@ export function Dashboard({ activities, onActivityEdit, onActivityDelete }: Dash
             </div>
             <div>
               <h2 className="text-base font-bold text-text-primary">現在地</h2>
-              <p className="text-sm text-text-secondary">沖縄県大宜味村</p>
+              <p className="text-sm text-text-secondary">{location.name}</p>
             </div>
           </div>
           
@@ -80,38 +77,14 @@ export function Dashboard({ activities, onActivityEdit, onActivityDelete }: Dash
         </motion.div>
       </StaggerItem>
 
-      {/* Calendar */}
+      {/* 作業日誌（ホームに統合） */}
       <StaggerItem>
-        <ActivityCalendar 
+        <Journal
           activities={activities}
+          onNewActivity={onNewActivity ?? (() => {})}
           onActivityEdit={onActivityEdit}
           onActivityDelete={onActivityDelete}
         />
-      </StaggerItem>
-
-      {/* Recent Activities */}
-      <StaggerItem>
-        <div className="card-natural p-5">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-2xl bg-terracotta-100 flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-terracotta-500" />
-            </div>
-            <div>
-              <h2 className="text-base font-bold text-text-primary">最近の活動</h2>
-              <p className="text-sm text-text-secondary">直近の記録一覧</p>
-            </div>
-          </div>
-          <ActivityList
-            activities={recentActivities}
-            onEdit={onActivityEdit}
-            onDelete={onActivityDelete}
-          />
-        </div>
-      </StaggerItem>
-
-      {/* Coffee News */}
-      <StaggerItem>
-        <CoffeeNews />
       </StaggerItem>
     </StaggerContainer>
   );

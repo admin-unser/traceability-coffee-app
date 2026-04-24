@@ -1,6 +1,16 @@
+export interface Plot {
+  id: string;
+  name: string; // 区画名（例: エリアA、区画1）
+  description?: string; // 区画の説明
+  location?: string; // 位置情報
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Tree {
   id: string;
   treeId: string; // 木番号（例: No.042）
+  plotId?: string; // 区画ID（区画管理を使用する場合）
   name?: string; // 木の名前（任意）
   location?: string; // 位置情報（任意）
   plantedDate?: string; // 植栽日
